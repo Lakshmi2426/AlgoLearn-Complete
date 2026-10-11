@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix ALGOLEARN-BST",
+  "description": "Imported from GitHub: ntanisha-crypto/ALGOLEARN-BST",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

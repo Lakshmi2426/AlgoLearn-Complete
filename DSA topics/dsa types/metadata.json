@@ -1,8 +1,0 @@
-{
-  "name": "Remix Remix AlgoLearn-Stack",
-  "description": "Comprehensive interactive educational platform with unified full-screen video player for Data Structures and Types animated educational videos.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}
