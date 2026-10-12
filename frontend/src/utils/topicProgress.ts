@@ -593,9 +593,39 @@ export function getTopicScore(topicIdOrTitle: string, explicitUserKey?: string):
     }
   }
 
-  // 3. Check native module storage
+  // 3. Check unscoped direct key (written by iframe module runner)
+  const unscopedDirect = localStorage.getItem(`algolearn_topic_progress_${moduleId}`);
+  if (unscopedDirect) {
+    const parsed = parseInt(unscopedDirect, 10);
+    if (!isNaN(parsed) && parsed >= 0) {
+      directSavedScore = Math.max(directSavedScore, parsed);
+    }
+  }
+
+  // 4. Check global topics map (written by iframe module runner)
+  const globalMapRaw = localStorage.getItem('algolearn_topics_progress');
+  if (globalMapRaw) {
+    const map = safeJsonParse<Record<string, number>>(globalMapRaw);
+    if (map && typeof map[moduleId] === 'number') {
+      directSavedScore = Math.max(directSavedScore, map[moduleId]);
+    }
+  }
+
+  // 5. Check native module storage
   const nativeScore = readNativeModuleProgress(moduleId);
   const bestScore = Math.min(100, Math.max(0, directSavedScore, nativeScore));
+
+  // Automatically persist resolved positive score so it survives refreshes
+  if (bestScore > 0 && (!scopedDirect || parseInt(scopedDirect, 10) < bestScore)) {
+    try {
+      localStorage.setItem(`algolearn_topic_progress_${studentKey}_${moduleId}`, String(bestScore));
+      if (studentData) {
+        if (!studentData.topicScores) studentData.topicScores = {};
+        studentData.topicScores[moduleId] = bestScore;
+        localStorage.setItem(`algolearn_student_progress_${studentKey}`, JSON.stringify(studentData));
+      }
+    } catch {}
+  }
 
   return bestScore;
 }
@@ -632,12 +662,12 @@ export function setTopicScore(topicIdOrTitle: string, score: number, explicitUse
   // Snapshot active module keys for this student
   studentData.moduleKeys = snapshotActiveModuleKeys();
 
-  // Compute updated XP
+  // Compute updated XP (1 point per topic point earned, no 10x multiplier)
   let sumScores = 0;
   CANONICAL_MODULE_IDS.forEach((id) => {
     sumScores += (studentData.topicScores?.[id] || (id === moduleId ? cleanScore : 0));
   });
-  studentData.xp = sumScores * 10;
+  studentData.xp = sumScores;
 
   localStorage.setItem(`algolearn_student_progress_${studentKey}`, JSON.stringify(studentData));
 
@@ -697,7 +727,7 @@ export function getAllTopicsProgress(explicitUserKey?: string): TopicProgressSum
     Math.round((totalEarned / totalPossible) * 100)
   );
 
-  const totalXP = totalEarned * 10;
+  const totalXP = totalEarned;
 
   return {
     topicScores,
@@ -737,7 +767,7 @@ export function syncUserProfileWithTopicProgress(user: UserProfile): UserProfile
   return {
     ...user,
     exploredTopics,
-    topicsMastered: isGuest ? 0 : summary.topicsMasteredCount,
-    xp: isGuest ? 0 : Math.max(user.xp, summary.totalXP),
+    topicsMastered: isGuest ? 0 : Math.max(user.topicsMastered || 0, summary.topicsMasteredCount),
+    xp: isGuest ? 0 : Math.max(user.xp || 0, summary.totalXP),
   };
 }

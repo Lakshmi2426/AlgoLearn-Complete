@@ -7,13 +7,19 @@ try {
 } catch (e) {}
 
 const connectDB = async () => {
+  if (!process.env.MONGO_URI) {
+    console.warn('⚠️ MONGO_URI is not set. AlgoLearn is running in local persistent JSON storage mode.');
+    return null;
+  }
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 2500,
+    });
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    throw error;
+    console.warn(`⚠️ MongoDB Connection Error (${error.message}). Falling back to local persistent JSON storage mode.`);
+    return null;
   }
 };
 

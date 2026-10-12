@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const studentStore = require('../services/studentStore');
 
 const StudentSchema = new mongoose.Schema(
   {
@@ -64,4 +65,46 @@ const StudentSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Student', StudentSchema);
+// Disable buffering so unhandled Mongoose operations fail fast rather than hanging 10s
+mongoose.set('bufferCommands', false);
+
+const MongooseStudent = mongoose.models.Student || mongoose.model('Student', StudentSchema);
+
+function Student(data) {
+  if (mongoose.connection.readyState === 1) {
+    return new MongooseStudent(data);
+  }
+  return studentStore.newStudent(data);
+}
+
+Student.schema = StudentSchema;
+
+Student.findOne = function (filter) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseStudent.findOne(filter);
+  }
+  return studentStore.findOne(filter);
+};
+
+Student.findById = function (id) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseStudent.findById(id);
+  }
+  return studentStore.findById(id);
+};
+
+Student.find = function (filter, projection) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseStudent.find(filter, projection);
+  }
+  return studentStore.find(filter, projection);
+};
+
+Student.create = async function (data) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseStudent.create(data);
+  }
+  return studentStore.create(data);
+};
+
+module.exports = Student;

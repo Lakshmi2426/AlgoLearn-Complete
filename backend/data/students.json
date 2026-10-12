@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Shaik Dada Khalander",
+    "branch": "2/4 CSIT-A",
+    "regdNo": "25B91A07A4",
+    "password": "$2b$10$NMyJcp3MGPzKUbzaLBmhfOrdfBSYCabe1AzXki3As2JulEhljIZVS",
+    "role": "student",
+    "xp": 3,
+    "topicsStarted": 0,
+    "topicsCompleted": 0,
+    "overallProgress": 0,
+    "progress": {},
+    "_id": "std_1791786136125_akcpi5",
+    "createdAt": "2026-10-12T06:22:16.126Z",
+    "updatedAt": "2026-10-12T07:21:12.278Z"
+  }
+]
