@@ -6,12 +6,12 @@
     "password": "$2b$10$NMyJcp3MGPzKUbzaLBmhfOrdfBSYCabe1AzXki3As2JulEhljIZVS",
     "role": "student",
     "xp": 3,
-    "topicsStarted": 0,
+    "topicsStarted": 1,
     "topicsCompleted": 0,
     "overallProgress": 0,
     "progress": {},
     "_id": "std_1791786136125_akcpi5",
     "createdAt": "2026-10-12T06:22:16.126Z",
-    "updatedAt": "2026-10-12T07:21:12.278Z"
+    "updatedAt": "2026-10-12T07:33:05.004Z"
   }
 ]
