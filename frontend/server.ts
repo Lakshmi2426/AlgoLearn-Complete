@@ -34,8 +34,7 @@ function getGeminiClient(): GoogleGenAI | null {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
-
+  const PORT = Number(process.env.PORT) || 3000;
   app.use(express.json({ limit: "5mb" }));
 
   // DSA Topic Mini-Websites Mapping for 11 Integrated Modules
@@ -83,7 +82,7 @@ async function startServer() {
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     return folderName || "";
   };
@@ -689,11 +688,12 @@ async function startServer() {
   // ============================================================
   // BACKEND API PROXY (Port 5000: Express + MongoDB Auth & Students)
   // ============================================================
-  const BACKEND_URL = "http://127.0.0.1:5000";
-
+  const BACKEND_URL =
+    process.env.BACKEND_URL?.trim().replace(/\/+$/, "") ||
+    "http://127.0.0.1:5000";
   const ensureBackend = () => {
     try {
-      const testReq = http.get(`${BACKEND_URL}/api/health`, (_res) => {});
+      const testReq = http.get(`${BACKEND_URL}/api/health`, (_res) => { });
       testReq.on("error", () => {
         try {
           const backendDir = path.resolve(__dirname, "..", "backend");
@@ -709,10 +709,11 @@ async function startServer() {
           console.error("Failed to auto-start backend process:", err.message);
         }
       });
-    } catch (e) {}
+    } catch (e) { }
   };
-  ensureBackend();
-
+  if (!process.env.BACKEND_URL) {
+    ensureBackend();
+  }
   const proxyToBackend = async (req: express.Request, res: express.Response) => {
     try {
       const targetUrl = `${BACKEND_URL}${req.originalUrl}`;
@@ -1530,11 +1531,11 @@ ${String(code)}
       for (const id of ids) {
         try {
           await fetch(`http://localhost:${PORT}/dsa-modules/${id}`);
-        } catch {}
+        } catch { }
       }
       try {
         await fetch(`http://localhost:${PORT}/`);
-      } catch {}
+      } catch { }
     }, 500);
   });
 
